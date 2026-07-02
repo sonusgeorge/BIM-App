@@ -97,7 +97,10 @@ and later: sections, measure, plans).
 
 - Editing/authoring models (That Open's modeling engine is early-stage; revisit later)
 - Reading .rvt files directly (proprietary — not possible with open source; IFC export
-  is the standard route)
+  is the standard route). Investigated 2026-07-02: the only path is Autodesk Platform
+  Services cloud conversion, which is paid and needs a backend — revisit only if the
+  zero-cost constraint is ever relaxed. A free Revit batch-export script is a cheaper
+  future convenience.
 - Multi-user collaboration, accounts, clash detection — possible later phases
 
 ## 7. Success criteria
