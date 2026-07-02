@@ -3,6 +3,9 @@ import type { Viewer } from "./viewer";
 import { isProbablyIfc } from "./validate";
 import { cacheKey, getCachedFragments, putCachedFragments } from "./cache";
 
+const inFlight = new Set<string>();
+
+/** Must be called exactly once to initialize loading infrastructure and event listeners. */
 export async function initLoading(viewer: Viewer): Promise<void> {
   const { components, world } = viewer;
 
@@ -33,34 +36,39 @@ export async function loadModelFile(
   const fragments = components.get(OBC.FragmentsManager);
   const modelId = file.name.replace(/\.[^.]+$/, "");
 
-  if (fragments.list.has(modelId)) {
+  if (inFlight.has(modelId) || fragments.list.has(modelId)) {
     throw new Error(`"${file.name}" is already loaded.`);
   }
 
-  const key = cacheKey(file);
-  const cached = await getCachedFragments(key);
-  if (cached) {
-    await fragments.core.load(cached, { modelId });
-    return { modelId, fromCache: true };
+  inFlight.add(modelId);
+  try {
+    const key = cacheKey(file);
+    const cached = await getCachedFragments(key);
+    if (cached) {
+      await fragments.core.load(cached, { modelId });
+      return { modelId, fromCache: true };
+    }
+
+    const buffer = new Uint8Array(await file.arrayBuffer());
+    if (!isProbablyIfc(buffer)) {
+      throw new Error(
+        `"${file.name}" couldn't be read as an IFC file. Export it from Revit via File → Export → IFC and try again.`,
+      );
+    }
+
+    const ifcLoader = components.get(OBC.IfcLoader);
+    await ifcLoader.load(buffer, false, modelId, {
+      processData: { progressCallback: onProgress },
+    });
+
+    const model = fragments.list.get(modelId);
+    if (model) {
+      const fragBuffer = await model.getBuffer(false);
+      await putCachedFragments(key, fragBuffer);
+    }
+
+    return { modelId, fromCache: false };
+  } finally {
+    inFlight.delete(modelId);
   }
-
-  const buffer = new Uint8Array(await file.arrayBuffer());
-  if (!isProbablyIfc(buffer)) {
-    throw new Error(
-      `"${file.name}" couldn't be read as an IFC file. Export it from Revit via File → Export → IFC and try again.`,
-    );
-  }
-
-  const ifcLoader = components.get(OBC.IfcLoader);
-  await ifcLoader.load(buffer, false, modelId, {
-    processData: { progressCallback: onProgress },
-  });
-
-  const model = fragments.list.get(modelId);
-  if (model) {
-    const fragBuffer = await model.getBuffer(false);
-    await putCachedFragments(key, fragBuffer);
-  }
-
-  return { modelId, fromCache: false };
 }
