@@ -1,0 +1,22 @@
+# Dependencies and build output
+node_modules/
+dist/
+
+# Environment / secrets — never commit
+.env
+.env.*
+
+# BIM model files — may contain client/project data; this repo is public
+*.ifc
+*.ifczip
+*.frag
+*.rvt
+models/
+
+# Local tool settings
+.claude/settings.local.json
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.log
