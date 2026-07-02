@@ -9,6 +9,8 @@ import { createPropertiesPanel } from "./ui/panels/properties";
 import { showProgress, showStatus } from "./ui/status";
 import { enableDropzone } from "./features/dropzone";
 import { setupSelection } from "./features/selection";
+import { hideSelected, isolateSelected, showAll } from "./features/visibility";
+import { fitToView } from "./features/camera";
 
 async function main() {
   BUI.Manager.init();
@@ -43,10 +45,10 @@ async function main() {
 
   const handlers: ToolbarHandlers = {
     onOpenFile: openFile,
-    onFit: () => {},
-    onHide: () => {},
-    onIsolate: () => {},
-    onShowAll: () => {},
+    onFit: () => void fitToView(viewer),
+    onHide: () => void hideSelected(viewer),
+    onIsolate: () => void isolateSelected(viewer),
+    onShowAll: () => void showAll(viewer),
   };
   layout.setToolbar(createToolbar(handlers));
   layout.setLeftPanel(createTreePanel(viewer));
