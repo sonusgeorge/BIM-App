@@ -1,0 +1,44 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: system-ui, sans-serif;
+}
+
+#app {
+  height: 100%;
+}
+
+.status-toast {
+  display: none;
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background: #2b2b2b;
+  color: #fff;
+  font-size: 0.875rem;
+  max-width: 80vw;
+}
+
+.status-toast[data-kind="error"] {
+  background: #8b1e1e;
+}
+
+.dropzone-active::after {
+  content: "Drop IFC file to load";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(30, 90, 160, 0.35);
+  color: #fff;
+  font-size: 1.5rem;
+  pointer-events: none;
+  z-index: 50;
+}

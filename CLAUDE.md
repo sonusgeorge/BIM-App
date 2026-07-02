@@ -4,10 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project state
 
-Pre-implementation. The approved design lives in
-`docs/superpowers/specs/2026-07-02-bim-viewer-design.md` — read it before doing any
-work. No application code exists yet; there are no build/test commands until the
-Vite scaffold lands.
+Phase 1 (core viewer) implemented. Design spec:
+`docs/superpowers/specs/2026-07-02-bim-viewer-design.md`. Plan:
+`docs/superpowers/plans/2026-07-02-phase1-core-viewer.md`.
+
+## Commands
+
+- `npm run dev` — dev server
+- `npm test` — Vitest unit tests (pure logic only; rendering is verified in-browser)
+- `npm run build && npm run preview` — production build check
+
+Test model: `models/school_str.ifc` (gitignored; re-download from
+https://thatopen.github.io/engine_components/resources/ifc/school_str.ifc if missing).
 
 ## What this project is
 
@@ -19,7 +27,7 @@ Company's open source stack:
 - **Architecture:** 100% client-side static web app. IFC files are parsed in the
   browser via WebAssembly and converted to the Fragments format; no backend, no
   accounts, no paid services. This zero-cost constraint is a hard requirement.
-- **Planned structure:** `src/core/` (scene/camera/loading), `src/features/` (one
+- **Structure:** `src/core/` (scene/camera/loading), `src/features/` (one
   folder per feature), `src/ui/` (layout/panels), `src/main.ts` (wiring)
 - **Phases:** 1) core viewer (load IFC, navigate, model tree, properties,
   hide/isolate) → 2) sections, measurements, floor plans, search, quantities →
