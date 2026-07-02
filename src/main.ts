@@ -64,4 +64,6 @@ async function main() {
   });
 }
 
-main();
+main().catch((error: unknown) => {
+  showStatus(error instanceof Error ? error.message : String(error), "error");
+});

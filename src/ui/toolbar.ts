@@ -13,9 +13,12 @@ export function createToolbar(handlers: ToolbarHandlers): HTMLElement {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ".ifc";
+    input.style.display = "none";
+    document.body.append(input);
     input.onchange = () => {
       const file = input.files?.[0];
       if (file) handlers.onOpenFile(file);
+      input.remove();
     };
     input.click();
   };

@@ -43,7 +43,12 @@ export async function loadModelFile(
   inFlight.add(modelId);
   try {
     const key = cacheKey(file);
-    const cached = await getCachedFragments(key);
+    let cached: ArrayBuffer | undefined;
+    try {
+      cached = await getCachedFragments(key);
+    } catch (error) {
+      console.warn("[bim-viewer] fragments cache unavailable:", error);
+    }
     if (cached) {
       await fragments.core.load(cached, { modelId });
       return { modelId, fromCache: true };
@@ -63,8 +68,12 @@ export async function loadModelFile(
 
     const model = fragments.list.get(modelId);
     if (model) {
-      const fragBuffer = await model.getBuffer(false);
-      await putCachedFragments(key, fragBuffer);
+      try {
+        const fragBuffer = await model.getBuffer(false);
+        await putCachedFragments(key, fragBuffer);
+      } catch (error) {
+        console.warn("[bim-viewer] fragments cache unavailable:", error);
+      }
     }
 
     return { modelId, fromCache: false };
