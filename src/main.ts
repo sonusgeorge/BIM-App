@@ -4,6 +4,7 @@ import { createViewer } from "./core/viewer";
 import { initLoading, loadModelFile } from "./core/loader";
 import { createLayout } from "./ui/layout";
 import { createToolbar, type ToolbarHandlers } from "./ui/toolbar";
+import { createTreePanel } from "./ui/panels/tree";
 import { showProgress, showStatus } from "./ui/status";
 import { enableDropzone } from "./features/dropzone";
 
@@ -43,6 +44,7 @@ async function main() {
     onShowAll: () => {},
   };
   layout.setToolbar(createToolbar(handlers));
+  layout.setLeftPanel(createTreePanel(viewer));
 
   enableDropzone(layout.viewport, (files) => {
     for (const file of files) void openFile(file);
