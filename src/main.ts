@@ -1,23 +1,52 @@
 import "./style.css";
+import * as BUI from "@thatopen/ui";
 import { createViewer } from "./core/viewer";
 import { initLoading, loadModelFile } from "./core/loader";
+import { createLayout } from "./ui/layout";
+import { createToolbar, type ToolbarHandlers } from "./ui/toolbar";
+import { showProgress, showStatus } from "./ui/status";
+import { enableDropzone } from "./features/dropzone";
 
-const container = document.getElementById("app")!;
-const viewer = createViewer(container);
+async function main() {
+  BUI.Manager.init();
 
-const input = document.createElement("input");
-input.type = "file";
-input.accept = ".ifc";
-input.style.cssText = "position:absolute;top:8px;left:8px;z-index:10;";
-document.body.append(input);
+  const app = document.getElementById("app")!;
+  const layout = createLayout(app);
 
-initLoading(viewer).then(() => {
-  input.onchange = async () => {
-    const file = input.files?.[0];
-    if (!file) return;
-    const result = await loadModelFile(viewer, file, (p) =>
-      console.log("progress", p),
-    );
-    console.log("loaded", result);
+  const viewer = createViewer(layout.viewport);
+  await initLoading(viewer);
+
+  const openFile = async (file: File) => {
+    try {
+      showProgress(`Converting ${file.name}…`, 0);
+      const result = await loadModelFile(viewer, file, (p) =>
+        showProgress(`Converting ${file.name}…`, p),
+      );
+      showProgress("", null);
+      showStatus(
+        result.fromCache
+          ? `${file.name} loaded from cache.`
+          : `${file.name} converted and loaded.`,
+        "info",
+      );
+    } catch (error) {
+      showProgress("", null);
+      showStatus(error instanceof Error ? error.message : String(error), "error");
+    }
   };
-});
+
+  const handlers: ToolbarHandlers = {
+    onOpenFile: openFile,
+    onFit: () => {},
+    onHide: () => {},
+    onIsolate: () => {},
+    onShowAll: () => {},
+  };
+  layout.setToolbar(createToolbar(handlers));
+
+  enableDropzone(layout.viewport, (files) => {
+    for (const file of files) void openFile(file);
+  });
+}
+
+main();
