@@ -43,12 +43,18 @@ async function main() {
     }
   };
 
+  const runAction = (action: Promise<void>) => {
+    action.catch((error: unknown) => {
+      showStatus(error instanceof Error ? error.message : String(error), "error");
+    });
+  };
+
   const handlers: ToolbarHandlers = {
     onOpenFile: openFile,
-    onFit: () => void fitToView(viewer),
-    onHide: () => void hideSelected(viewer),
-    onIsolate: () => void isolateSelected(viewer),
-    onShowAll: () => void showAll(viewer),
+    onFit: () => runAction(fitToView(viewer)),
+    onHide: () => runAction(hideSelected(viewer)),
+    onIsolate: () => runAction(isolateSelected(viewer)),
+    onShowAll: () => runAction(showAll(viewer)),
   };
   layout.setToolbar(createToolbar(handlers));
   layout.setLeftPanel(createTreePanel(viewer));
