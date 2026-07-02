@@ -5,8 +5,10 @@ import { initLoading, loadModelFile } from "./core/loader";
 import { createLayout } from "./ui/layout";
 import { createToolbar, type ToolbarHandlers } from "./ui/toolbar";
 import { createTreePanel } from "./ui/panels/tree";
+import { createPropertiesPanel } from "./ui/panels/properties";
 import { showProgress, showStatus } from "./ui/status";
 import { enableDropzone } from "./features/dropzone";
+import { setupSelection } from "./features/selection";
 
 async function main() {
   BUI.Manager.init();
@@ -16,6 +18,9 @@ async function main() {
 
   const viewer = createViewer(layout.viewport);
   await initLoading(viewer);
+
+  setupSelection(viewer);
+  layout.setRightPanel(createPropertiesPanel(viewer));
 
   const openFile = async (file: File) => {
     try {
