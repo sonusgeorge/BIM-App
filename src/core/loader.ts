@@ -24,7 +24,14 @@ export async function initLoading(viewer: Viewer): Promise<void> {
   });
 
   const ifcLoader = components.get(OBC.IfcLoader);
-  await ifcLoader.setup({ autoSetWasm: true });
+  // autoSetWasm resolves the WASM version from a stale release constant in
+  // @thatopen/components, fetching a binary that mismatches the bundled
+  // web-ifc glue code. Serve the matching binary ourselves instead
+  // (staged into public/wasm/ by scripts/copy-wasm.mjs).
+  await ifcLoader.setup({
+    autoSetWasm: false,
+    wasm: { path: "/wasm/", absolute: true },
+  });
 }
 
 export async function loadModelFile(

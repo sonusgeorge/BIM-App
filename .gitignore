@@ -2,6 +2,9 @@
 node_modules/
 dist/
 
+# Staged by scripts/copy-wasm.mjs from node_modules/web-ifc
+public/wasm/
+
 # Environment / secrets — never commit
 .env
 .env.*
